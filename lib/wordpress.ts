@@ -8,7 +8,7 @@ const WP_API_URL = process.env.WORDPRESS_API_URL || "https://your-wordpress-site
 export async function getAllJobs(): Promise<Job[]> {
   try {
     // Use a more robust URL construction
-    const url = new URL(`${WP_API_URL}/jobs`)
+    const url = new URL(`${WP_API_URL}/job-listings`)
     url.searchParams.append("_embed", "true")
     url.searchParams.append("per_page", "100")
 
@@ -75,7 +75,7 @@ export async function getAllJobs(): Promise<Job[]> {
 // Replace the getJob function with this improved version
 export async function getJob(slug: string): Promise<Job | null> {
   try {
-    const url = new URL(`${WP_API_URL}/jobs`)
+    const url = new URL(`${WP_API_URL}/job-listings`)
     url.searchParams.append("slug", slug)
     url.searchParams.append("_embed", "true")
 
