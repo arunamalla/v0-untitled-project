@@ -1,3 +1,4 @@
+"use client"
 import { useState, useEffect } from "react"
 import ClientListings from "@/components/client-listings"
 import type { Client } from "@/types/client" // Assuming you have a type defined for client data
