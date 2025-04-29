@@ -18,6 +18,8 @@ export interface Job {
     location?: string
     job_type?: string
     salary?: string
+    logo_url?: string // Company logo URL from Blob storage
+    image_url?: string // Job banner image URL from Blob storage
     [key: string]: any
   }
   _embedded?: any

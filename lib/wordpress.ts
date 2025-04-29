@@ -4,7 +4,8 @@ import type { Client } from "@/types/client"
 // Update the WP_API_URL to use a placeholder that can be easily updated
 const WP_API_URL = process.env.WORDPRESS_API_URL || "https://your-wordpress-site.com/wp-json/wp/v2"
 
-// Replace the entire getAllJobs function with this improved version that handles errors better
+// Update the getAllJobs function to provide fallback data when the API is unavailable
+
 export async function getAllJobs(): Promise<Job[]> {
   try {
     // Use a more robust URL construction
@@ -15,21 +16,27 @@ export async function getAllJobs(): Promise<Job[]> {
     // Fetch jobs with better error handling
     const jobsResponse = await fetch(url.toString(), {
       next: { revalidate: 60 }, // Revalidate every minute
+    }).catch((error) => {
+      console.error("Network error fetching jobs:", error)
+      return new Response(null, { status: 404 })
     })
 
     if (!jobsResponse.ok) {
-      throw new Error(`Failed to fetch jobs: ${jobsResponse.status}`)
+      console.error(`Failed to fetch jobs: ${jobsResponse.status}`)
+
+      // Return fallback data when API is unavailable
+      return getFallbackJobs()
     }
 
     const jobs: Job[] = await jobsResponse.json()
 
-    // If no jobs are returned or the API doesn't exist yet, return an empty array
+    // If no jobs are returned or the API doesn't exist yet, return fallback data
     if (!jobs || !Array.isArray(jobs)) {
       console.log("No jobs found or invalid response format")
-      return []
+      return getFallbackJobs()
     }
 
-    // Safely extract category IDs
+    // Rest of the function remains the same...
     const categoryIds = new Set<number>()
     jobs.forEach((job) => {
       if (job.categories && Array.isArray(job.categories)) {
@@ -67,12 +74,107 @@ export async function getAllJobs(): Promise<Job[]> {
     }))
   } catch (error) {
     console.error("Error fetching jobs:", error)
-    // Return empty array instead of failing
-    return []
+    // Return fallback data instead of empty array
+    return getFallbackJobs()
   }
 }
 
-// Replace the getJob function with this improved version
+// Add a new function to provide fallback job data
+function getFallbackJobs(): Job[] {
+  const currentDate = new Date().toISOString()
+
+  return [
+    {
+      id: 1001,
+      date: currentDate,
+      slug: "frontend-developer",
+      title: {
+        rendered: "Frontend Developer",
+      },
+      content: {
+        rendered: `<p>We are looking for a skilled Frontend Developer to join our team. The ideal candidate should have experience with React, TypeScript, and modern CSS frameworks.</p>
+        <h3>Requirements:</h3>
+        <ul>
+          <li>3+ years of experience with React</li>
+          <li>Strong knowledge of TypeScript</li>
+          <li>Experience with CSS frameworks like Tailwind</li>
+          <li>Understanding of responsive design principles</li>
+        </ul>`,
+      },
+      excerpt: {
+        rendered: "We are looking for a skilled Frontend Developer to join our team.",
+      },
+      categories: [1],
+      categories_data: [{ id: 1, name: "Technology", slug: "technology", count: 3 }],
+      meta: {
+        company: "Tech Solutions Inc.",
+        location: "Remote",
+        job_type: "Full-time",
+        salary: "$80,000 - $120,000",
+      },
+    },
+    {
+      id: 1002,
+      date: currentDate,
+      slug: "ux-designer",
+      title: {
+        rendered: "UX Designer",
+      },
+      content: {
+        rendered: `<p>Join our creative team as a UX Designer to create beautiful and functional user experiences for our products.</p>
+        <h3>Requirements:</h3>
+        <ul>
+          <li>Portfolio demonstrating UX design skills</li>
+          <li>Experience with Figma or similar design tools</li>
+          <li>Understanding of user research and testing</li>
+          <li>Ability to collaborate with developers</li>
+        </ul>`,
+      },
+      excerpt: {
+        rendered: "Join our creative team as a UX Designer to create beautiful and functional user experiences.",
+      },
+      categories: [3],
+      categories_data: [{ id: 3, name: "Design", slug: "design", count: 2 }],
+      meta: {
+        company: "Creative Agency",
+        location: "San Francisco, CA",
+        job_type: "Full-time",
+        salary: "$90,000 - $110,000",
+      },
+    },
+    {
+      id: 1003,
+      date: currentDate,
+      slug: "marketing-manager",
+      title: {
+        rendered: "Marketing Manager",
+      },
+      content: {
+        rendered: `<p>We're seeking an experienced Marketing Manager to lead our marketing efforts and drive growth.</p>
+        <h3>Requirements:</h3>
+        <ul>
+          <li>5+ years of marketing experience</li>
+          <li>Experience with digital marketing channels</li>
+          <li>Strong analytical skills</li>
+          <li>Excellent communication abilities</li>
+        </ul>`,
+      },
+      excerpt: {
+        rendered: "We're seeking an experienced Marketing Manager to lead our marketing efforts and drive growth.",
+      },
+      categories: [2],
+      categories_data: [{ id: 2, name: "Marketing", slug: "marketing", count: 1 }],
+      meta: {
+        company: "Growth Co",
+        location: "New York, NY",
+        job_type: "Full-time",
+        salary: "$85,000 - $115,000",
+      },
+    },
+  ]
+}
+
+// Update the getJob function to handle 404 errors and provide fallback data
 export async function getJob(slug: string): Promise<Job | null> {
   try {
     const url = new URL(`${WP_API_URL}/jobs`)
@@ -81,16 +183,26 @@ export async function getJob(slug: string): Promise<Job | null> {
 
     const response = await fetch(url.toString(), {
       next: { revalidate: 60 }, // Revalidate every minute
+    }).catch(() => {
+      return new Response(null, { status: 404 })
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch job: ${response.status}`)
+      console.error(`Failed to fetch job: ${response.status}`)
+
+      // For specific job slugs, return fallback data
+      const fallbackJobs = getFallbackJobs()
+      const fallbackJob = fallbackJobs.find((job) => job.slug === slug)
+      return fallbackJob || null
     }
 
     const jobs = await response.json()
 
     if (!jobs || !Array.isArray(jobs) || jobs.length === 0) {
-      return null
+      // Check fallback data for this slug
+      const fallbackJobs = getFallbackJobs()
+      const fallbackJob = fallbackJobs.find((job) => job.slug === slug)
+      return fallbackJob || null
     }
 
     const job = jobs[0]
@@ -118,7 +230,11 @@ export async function getJob(slug: string): Promise<Job | null> {
     return job
   } catch (error) {
     console.error("Error fetching job:", error)
-    return null
+
+    // Check fallback data for this slug
+    const fallbackJobs = getFallbackJobs()
+    const fallbackJob = fallbackJobs.find((job) => job.slug === slug)
+    return fallbackJob || null
   }
 }
 

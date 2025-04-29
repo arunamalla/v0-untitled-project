@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { useClients } from "@/hooks/use-clients"
 import { ClientCard } from "@/components/client-card"
 import { Input } from "@/components/ui/input"
@@ -10,28 +10,20 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Search, Filter, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-const industries = ["technology", "healthcare", "finance", "education", "manufacturing"]
-const locations = ["San Francisco", "Boston", "New York", "Chicago", "Los Angeles"]
-
 export default function ClientListings() {
   const [searchTerm, setSearchTerm] = useState("")
   const [industry, setIndustry] = useState("all")
-  const [location, setLocation] = useState("all")
   const { clients, isLoading, isError } = useClients()
 
-  const filteredClients = useMemo(() => {
-    return clients?.filter((client) => {
-      const matchesSearch =
-        client.title.rendered.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.content.rendered.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClients = clients?.filter((client) => {
+    const matchesSearch =
+      client.title.rendered.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.content.rendered.toLowerCase().includes(searchTerm.toLowerCase())
 
-      const matchesIndustry = industry === "all" || client.meta?.industry?.toLowerCase() === industry.toLowerCase()
+    const matchesIndustry = industry === "all" || client.meta?.industry?.toLowerCase() === industry.toLowerCase()
 
-      const matchesLocation = location === "all" || client.meta?.location?.toLowerCase().includes(location.toLowerCase())
-
-      return matchesSearch && matchesIndustry && matchesLocation
-    })
-  }, [clients, searchTerm, industry, location])
+    return matchesSearch && matchesIndustry
+  })
 
   return (
     <div id="client-listings">
@@ -46,29 +38,18 @@ export default function ClientListings() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="w-full md:w-48">
+          <div className="w-full md:w-64">
             <Select value={industry} onValueChange={setIndustry}>
               <SelectTrigger>
                 <SelectValue placeholder="All Industries" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Industries</SelectItem>
-                {industries.map((ind) => (
-                  <SelectItem key={ind} value={ind}>{ind.charAt(0).toUpperCase() + ind.slice(1)}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="w-full md:w-48">
-            <Select value={location} onValueChange={setLocation}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Locations" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Locations</SelectItem>
-                {locations.map((loc) => (
-                  <SelectItem key={loc} value={loc}>{loc}</SelectItem>
-                ))}
+                <SelectItem value="technology">Technology</SelectItem>
+                <SelectItem value="healthcare">Healthcare</SelectItem>
+                <SelectItem value="finance">Finance</SelectItem>
+                <SelectItem value="education">Education</SelectItem>
+                <SelectItem value="manufacturing">Manufacturing</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -101,9 +82,30 @@ export default function ClientListings() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>
-              There was a problem loading the client listings. Check if your WordPress API is properly configured.
+              There was a problem loading the client listings. This could be because the WordPress API is not properly
+              configured yet.
             </AlertDescription>
           </Alert>
+          <div className="bg-white rounded-lg shadow-sm p-8 max-w-2xl mx-auto">
+            <h3 className="text-xl font-semibold mb-4">Sample Client Listings</h3>
+            <p className="text-gray-600 mb-6">
+              While we're setting up the connection to your WordPress site, here are some sample client listings:
+            </p>
+            <div className="space-y-4">
+              {[
+                { title: "Acme Corporation", industry: "Technology", location: "San Francisco, CA" },
+                { title: "Global Healthcare", industry: "Healthcare", location: "Boston, MA" },
+                { title: "Finance Partners", industry: "Finance", location: "New York, NY" },
+              ].map((client, index) => (
+                <div key={index} className="p-4 border rounded-lg">
+                  <h4 className="font-medium">{client.title}</h4>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {client.industry} • {client.location}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
           <Button onClick={() => window.location.reload()} className="mt-6">
             Try Again
           </Button>
@@ -112,8 +114,18 @@ export default function ClientListings() {
         <div className="text-center py-12 bg-white rounded-lg shadow-sm">
           <h3 className="text-xl font-semibold mb-4">No Client Listings Found</h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Looks like there are no client listings yet. Ensure your WordPress site has the right post types published.
+            It looks like there are no client listings available yet. This could be because your WordPress site doesn't
+            have the clients custom post type set up, or there are no clients published.
           </p>
+          <div className="bg-emerald-50 p-6 rounded-lg max-w-xl mx-auto">
+            <h4 className="font-medium mb-2">WordPress Setup Tips:</h4>
+            <ul className="text-left text-sm space-y-2">
+              <li>• Ensure you have a custom post type called "clients" in WordPress</li>
+              <li>• Make sure the REST API is enabled for this post type</li>
+              <li>• Check that you have published some client posts</li>
+              <li>• Verify the WordPress URL in your configuration</li>
+            </ul>
+          </div>
         </div>
       ) : (
         <>
@@ -125,7 +137,6 @@ export default function ClientListings() {
                 onClick={() => {
                   setSearchTerm("")
                   setIndustry("all")
-                  setLocation("all")
                 }}
               >
                 Clear Filters
@@ -133,7 +144,7 @@ export default function ClientListings() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredClients.map((client) => (
+              {filteredClients?.map((client) => (
                 <ClientCard key={client.id} client={client} />
               ))}
             </div>

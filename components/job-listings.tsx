@@ -129,6 +129,16 @@ export default function JobListings() {
         </div>
       ) : (
         <>
+          {jobs.length > 0 && jobs[0].id >= 1000 && (
+            <Alert className="mb-6 bg-blue-50 border-blue-200">
+              <AlertCircle className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800">Using Demo Data</AlertTitle>
+              <AlertDescription className="text-blue-700">
+                Currently displaying demo job listings because the WordPress API connection is not available. Configure
+                your WORDPRESS_API_URL environment variable to connect to your WordPress site.
+              </AlertDescription>
+            </Alert>
+          )}
           <p className="mb-6 text-gray-600">{filteredJobs?.length || 0} jobs found</p>
           {filteredJobs?.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-lg shadow-sm">
