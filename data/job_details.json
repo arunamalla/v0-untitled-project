@@ -1,0 +1,157 @@
+[
+  {
+    "id": 1,
+    "company_name": "Google",
+    "title": "Senior Software Engineer",
+    "slug": "senior-software-engineer-google",
+    "url": "https://careers.google.com/jobs/123",
+    "location": "Mountain View, CA",
+    "scraped_at": "2023-04-28 12:34:56",
+    "date": "2023-04-28T12:34:56",
+    "details_extracted": true,
+    "sections": {
+      "description": "We are looking for a Senior Software Engineer to join our team and help build the next generation of Google products. You'll work on complex software systems and have the opportunity to influence the direction of Google's technology.",
+      "responsibilities": "Design and develop high-quality software solutions. Collaborate with cross-functional teams to define, design, and ship new features. Write clean, maintainable code with comprehensive test coverage.",
+      "requirements": "5+ years of experience in software development. Strong knowledge of data structures, algorithms, and software design. Experience with one or more general purpose programming languages including but not limited to: Java, C/C++, Python or JavaScript.",
+      "benefits": "Competitive salary, health insurance, 401k, flexible work arrangements, and more."
+    },
+    "contact_info": {
+      "email": "jobs@google.com",
+      "contact_person": "Recruiting Team"
+    },
+    "salary": "$150,000-$200,000",
+    "job_type": "Full-time",
+    "categories": [1, 2],
+    "meta": {
+      "company": "Google",
+      "location": "Mountain View, CA",
+      "job_type": "Full-time",
+      "salary": "$150,000-$200,000",
+      "logo_url": "https://logo.clearbit.com/google.com"
+    }
+  },
+  {
+    "id": 2,
+    "company_name": "Microsoft",
+    "title": "Product Manager",
+    "slug": "product-manager-microsoft",
+    "url": "https://careers.microsoft.com/jobs/456",
+    "location": "Redmond, WA",
+    "scraped_at": "2023-04-27 10:15:30",
+    "date": "2023-04-27T10:15:30",
+    "details_extracted": true,
+    "sections": {
+      "description": "Microsoft is looking for a Product Manager to drive the vision, strategy, and roadmap for our cloud services. You'll work closely with engineering, design, and marketing teams to deliver exceptional products.",
+      "responsibilities": "Define product vision and strategy. Gather and prioritize product requirements. Work with engineering teams to deliver features. Analyze market trends and competition.",
+      "requirements": "3+ years of product management experience. Strong analytical and problem-solving skills. Excellent communication and stakeholder management abilities.",
+      "benefits": "Competitive compensation package, health benefits, retirement plans, and generous time off."
+    },
+    "contact_info": {
+      "email": "careers@microsoft.com",
+      "contact_person": "HR Department"
+    },
+    "salary": "$130,000-$170,000",
+    "job_type": "Full-time",
+    "categories": [3, 4],
+    "meta": {
+      "company": "Microsoft",
+      "location": "Redmond, WA",
+      "job_type": "Full-time",
+      "salary": "$130,000-$170,000",
+      "logo_url": "https://logo.clearbit.com/microsoft.com"
+    }
+  },
+  {
+    "id": 3,
+    "company_name": "Amazon",
+    "title": "UX Designer",
+    "slug": "ux-designer-amazon",
+    "url": "https://amazon.jobs/789",
+    "location": "Seattle, WA",
+    "scraped_at": "2023-04-26 15:45:22",
+    "date": "2023-04-26T15:45:22",
+    "details_extracted": true,
+    "sections": {
+      "description": "Amazon is seeking a talented UX Designer to join our team. You'll create intuitive, user-centered designs for our products and services that millions of customers use every day.",
+      "responsibilities": "Create user flows, wireframes, and prototypes. Conduct user research and usability testing. Collaborate with product managers and engineers to implement designs.",
+      "requirements": "4+ years of UX design experience. Strong portfolio demonstrating your design process. Experience with design tools like Figma or Sketch.",
+      "benefits": "Comprehensive benefits package, competitive salary, stock options, and career growth opportunities."
+    },
+    "contact_info": {
+      "email": "design-jobs@amazon.com",
+      "contact_person": "Design Recruiting"
+    },
+    "salary": "$120,000-$160,000",
+    "job_type": "Full-time",
+    "categories": [5, 6],
+    "meta": {
+      "company": "Amazon",
+      "location": "Seattle, WA",
+      "job_type": "Full-time",
+      "salary": "$120,000-$160,000",
+      "logo_url": "https://logo.clearbit.com/amazon.com"
+    }
+  },
+  {
+    "id": 4,
+    "company_name": "Apple",
+    "title": "iOS Developer",
+    "slug": "ios-developer-apple",
+    "url": "https://apple.com/careers/101112",
+    "location": "Cupertino, CA",
+    "scraped_at": "2023-04-25 09:30:15",
+    "date": "2023-04-25T09:30:15",
+    "details_extracted": true,
+    "sections": {
+      "description": "Join Apple's iOS development team to create innovative apps for iPhone and iPad. You'll work on cutting-edge technology and contribute to products used by millions of people worldwide.",
+      "responsibilities": "Develop new features for iOS applications. Write clean, efficient code and perform code reviews. Collaborate with cross-functional teams to define and implement new features.",
+      "requirements": "5+ years of iOS development experience. Proficiency in Swift and Objective-C. Strong understanding of iOS frameworks and design patterns.",
+      "benefits": "Competitive salary, stock options, wellness programs, and education reimbursement."
+    },
+    "contact_info": {
+      "email": "ios-jobs@apple.com",
+      "contact_person": "iOS Recruiting Team"
+    },
+    "salary": "$140,000-$180,000",
+    "job_type": "Full-time",
+    "categories": [1, 7],
+    "meta": {
+      "company": "Apple",
+      "location": "Cupertino, CA",
+      "job_type": "Full-time",
+      "salary": "$140,000-$180,000",
+      "logo_url": "https://logo.clearbit.com/apple.com"
+    }
+  },
+  {
+    "id": 5,
+    "company_name": "Netflix",
+    "title": "Data Scientist",
+    "slug": "data-scientist-netflix",
+    "url": "https://jobs.netflix.com/131415",
+    "location": "Los Gatos, CA",
+    "scraped_at": "2023-04-24 14:20:45",
+    "date": "2023-04-24T14:20:45",
+    "details_extracted": true,
+    "sections": {
+      "description": "Netflix is looking for a Data Scientist to help us understand user behavior and improve our recommendation algorithms. You'll work with large datasets to extract insights that drive business decisions.",
+      "responsibilities": "Build and optimize machine learning models. Analyze user behavior data to identify patterns and trends. Collaborate with engineering teams to implement data-driven solutions.",
+      "requirements": "MS or PhD in Computer Science, Statistics, or related field. 3+ years of experience in data science or machine learning. Proficiency in Python, R, or similar languages.",
+      "benefits": "Competitive compensation, unlimited vacation policy, flexible work arrangements, and comprehensive health benefits."
+    },
+    "contact_info": {
+      "email": "data-jobs@netflix.com",
+      "contact_person": "Data Science Recruiting"
+    },
+    "salary": "$160,000-$200,000",
+    "job_type": "Full-time",
+    "categories": [8, 9],
+    "meta": {
+      "company": "Netflix",
+      "location": "Los Gatos, CA",
+      "job_type": "Full-time",
+      "salary": "$160,000-$200,000",
+      "logo_url": "https://logo.clearbit.com/netflix.com"
+    }
+  }
+]

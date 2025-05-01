@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Engineering",
+    "slug": "engineering",
+    "count": 10
+  },
+  {
+    "id": 2,
+    "name": "Software Development",
+    "slug": "software-development",
+    "count": 15
+  },
+  {
+    "id": 3,
+    "name": "Product Management",
+    "slug": "product-management",
+    "count": 8
+  },
+  {
+    "id": 4,
+    "name": "Business",
+    "slug": "business",
+    "count": 12
+  },
+  {
+    "id": 5,
+    "name": "Design",
+    "slug": "design",
+    "count": 7
+  },
+  {
+    "id": 6,
+    "name": "UX/UI",
+    "slug": "ux-ui",
+    "count": 5
+  },
+  {
+    "id": 7,
+    "name": "Mobile Development",
+    "slug": "mobile-development",
+    "count": 9
+  },
+  {
+    "id": 8,
+    "name": "Data Science",
+    "slug": "data-science",
+    "count": 6
+  },
+  {
+    "id": 9,
+    "name": "Machine Learning",
+    "slug": "machine-learning",
+    "count": 4
+  }
+]

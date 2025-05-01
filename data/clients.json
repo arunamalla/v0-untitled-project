@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "date": "2023-04-28T12:34:56",
+    "slug": "google",
+    "title": "Google",
+    "content": "Google is a multinational technology company specializing in Internet-related services and products, which include online advertising technologies, a search engine, cloud computing, software, and hardware. It is considered one of the Big Five technology companies alongside Amazon, Apple, Meta, and Microsoft.",
+    "excerpt": "Google is a multinational technology company...",
+    "categories": [1, 2],
+    "meta": {
+      "address": "1600 Amphitheatre Parkway, Mountain View, CA",
+      "website": "https://google.com",
+      "careers_url": "https://careers.google.com",
+      "industry": "Technology",
+      "stock_symbol": "GOOGL",
+      "logo_url": "https://logo.clearbit.com/google.com"
+    }
+  },
+  {
+    "id": 2,
+    "date": "2023-04-27T10:15:30",
+    "slug": "microsoft",
+    "title": "Microsoft",
+    "content": "Microsoft Corporation is an American multinational technology corporation that produces computer software, consumer electronics, personal computers, and related services. Its best-known software products are the Microsoft Windows line of operating systems, the Microsoft Office suite, and the Internet Explorer and Edge web browsers.",
+    "excerpt": "Microsoft Corporation is an American multinational...",
+    "categories": [1, 3],
+    "meta": {
+      "address": "One Microsoft Way, Redmond, WA",
+      "website": "https://microsoft.com",
+      "careers_url": "https://careers.microsoft.com",
+      "industry": "Technology",
+      "stock_symbol": "MSFT",
+      "logo_url": "https://logo.clearbit.com/microsoft.com"
+    }
+  },
+  {
+    "id": 3,
+    "date": "2023-04-26T15:45:22",
+    "slug": "amazon",
+    "title": "Amazon",
+    "content": "Amazon.com, Inc. is an American multinational technology company focusing on e-commerce, cloud computing, online advertising, digital streaming, and artificial intelligence. It has been referred to as 'one of the most influential economic and cultural forces in the world', and is one of the world's most valuable brands.",
+    "excerpt": "Amazon.com, Inc. is an American multinational technology company...",
+    "categories": [1, 4],
+    "meta": {
+      "address": "410 Terry Ave N, Seattle, WA",
+      "website": "https://amazon.com",
+      "careers_url": "https://amazon.jobs",
+      "industry": "Technology",
+      "stock_symbol": "AMZN",
+      "logo_url": "https://logo.clearbit.com/amazon.com"
+    }
+  },
+  {
+    "id": 4,
+    "date": "2023-04-25T09:30:15",
+    "slug": "apple",
+    "title": "Apple",
+    "content": "Apple Inc. is an American multinational technology company that specializes in consumer electronics, software and online services. Apple is the largest technology company by revenue and, as of June 2022, is the world's biggest company by market capitalization.",
+    "excerpt": "Apple Inc. is an American multinational technology company...",
+    "categories": [1, 5],
+    "meta": {
+      "address": "One Apple Park Way, Cupertino, CA",
+      "website": "https://apple.com",
+      "careers_url": "https://apple.com/careers",
+      "industry": "Technology",
+      "stock_symbol": "AAPL",
+      "logo_url": "https://logo.clearbit.com/apple.com"
+    }
+  },
+  {
+    "id": 5,
+    "date": "2023-04-24T14:20:45",
+    "slug": "netflix",
+    "title": "Netflix",
+    "content": "Netflix, Inc. is an American subscription video on-demand over-the-top streaming service and production company. Launched on January 16, 2007, it offers a film and television series library through distribution deals as well as its own productions, known as Netflix Originals.",
+    "excerpt": "Netflix, Inc. is an American subscription video on-demand...",
+    "categories": [6, 7],
+    "meta": {
+      "address": "100 Winchester Circle, Los Gatos, CA",
+      "website": "https://netflix.com",
+      "careers_url": "https://jobs.netflix.com",
+      "industry": "Entertainment",
+      "stock_symbol": "NFLX",
+      "logo_url": "https://logo.clearbit.com/netflix.com"
+    }
+  }
+]

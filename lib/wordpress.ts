@@ -1,319 +1,163 @@
+import fs from "fs"
+import path from "path"
 import type { Job, Category } from "@/types/job"
 import type { Client } from "@/types/client"
 
-// Update the WP_API_URL to use a placeholder that can be easily updated
-const WP_API_URL = process.env.WORDPRESS_API_URL || "https://your-wordpress-site.com/wp-json/wp/v2"
+// Function to read JSON data from a file
+function readJsonFile<T>(filePath: string): T {
+  try {
+    const fullPath = path.join(process.cwd(), filePath)
+    const fileContents = fs.readFileSync(fullPath, "utf8")
+    return JSON.parse(fileContents) as T
+  } catch (error) {
+    console.error(`Error reading file ${filePath}:`, error)
+    return [] as unknown as T
+  }
+}
 
-// Update the getAllJobs function to provide fallback data when the API is unavailable
+// Function to format job data to match the expected structure
+function formatJobData(job: any): Job {
+  return {
+    id: job.id,
+    date: job.date,
+    slug: job.slug,
+    title: {
+      rendered: job.title,
+    },
+    content: {
+      rendered: `<div>${Object.entries(job.sections)
+        .map(([key, value]) => `<h3>${key.charAt(0).toUpperCase() + key.slice(1)}</h3><p>${value}</p>`)
+        .join("")}</div>`,
+    },
+    excerpt: {
+      rendered: job.sections.description.substring(0, 150) + "...",
+    },
+    categories: job.categories || [],
+    meta: {
+      company: job.company_name || job.meta?.company,
+      location: job.location || job.meta?.location,
+      job_type: job.job_type || job.meta?.job_type,
+      salary: job.salary || job.meta?.salary,
+      logo_url: job.meta?.logo_url,
+      image_url: job.meta?.image_url,
+      ...job.meta,
+    },
+  }
+}
 
+// Replace the entire getAllJobs function with this improved version that uses local JSON
 export async function getAllJobs(): Promise<Job[]> {
   try {
-    // Use a more robust URL construction
-    const url = new URL(`${WP_API_URL}/jobs`)
-    url.searchParams.append("_embed", "true")
-    url.searchParams.append("per_page", "100")
+    // Read jobs from the JSON file
+    const jobs = readJsonFile<any[]>("data/job_details.json")
 
-    // Fetch jobs with better error handling
-    const jobsResponse = await fetch(url.toString(), {
-      next: { revalidate: 60 }, // Revalidate every minute
-    }).catch((error) => {
-      console.error("Network error fetching jobs:", error)
-      return new Response(null, { status: 404 })
-    })
+    // Read categories from the JSON file
+    const categories = readJsonFile<Category[]>("data/categories.json")
 
-    if (!jobsResponse.ok) {
-      console.error(`Failed to fetch jobs: ${jobsResponse.status}`)
+    // Format jobs and add category data
+    return jobs.map((job) => {
+      const formattedJob = formatJobData(job)
 
-      // Return fallback data when API is unavailable
-      return getFallbackJobs()
-    }
-
-    const jobs: Job[] = await jobsResponse.json()
-
-    // If no jobs are returned or the API doesn't exist yet, return fallback data
-    if (!jobs || !Array.isArray(jobs)) {
-      console.log("No jobs found or invalid response format")
-      return getFallbackJobs()
-    }
-
-    // Rest of the function remains the same...
-    const categoryIds = new Set<number>()
-    jobs.forEach((job) => {
+      // Add category data to the job
       if (job.categories && Array.isArray(job.categories)) {
-        job.categories.forEach((id) => categoryIds.add(id))
+        formattedJob.categories_data = categories.filter((cat) => job.categories.includes(cat.id))
       }
+
+      return formattedJob
     })
-
-    // Only fetch categories if we have any
-    let categories: Category[] = []
-    if (categoryIds.size > 0) {
-      try {
-        const categoriesUrl = new URL(`${WP_API_URL}/categories`)
-        categoriesUrl.searchParams.append("include", Array.from(categoryIds).join(","))
-
-        const categoriesResponse = await fetch(categoriesUrl.toString())
-
-        if (categoriesResponse.ok) {
-          const categoriesData = await categoriesResponse.json()
-          if (Array.isArray(categoriesData)) {
-            categories = categoriesData
-          }
-        }
-      } catch (categoryError) {
-        console.error("Error fetching categories:", categoryError)
-        // Continue without categories rather than failing completely
-      }
-    }
-
-    // Add category data to jobs
-    return jobs.map((job) => ({
-      ...job,
-      categories_data: categories.filter(
-        (cat) => job.categories && Array.isArray(job.categories) && job.categories.includes(cat.id),
-      ),
-    }))
   } catch (error) {
     console.error("Error fetching jobs:", error)
-    // Return fallback data instead of empty array
-    return getFallbackJobs()
+    return []
   }
 }
 
-// Add a new function to provide fallback job data
-function getFallbackJobs(): Job[] {
-  const currentDate = new Date().toISOString()
-
-  return [
-    {
-      id: 1001,
-      date: currentDate,
-      slug: "frontend-developer",
-      title: {
-        rendered: "Frontend Developer",
-      },
-      content: {
-        rendered: `<p>We are looking for a skilled Frontend Developer to join our team. The ideal candidate should have experience with React, TypeScript, and modern CSS frameworks.</p>
-        <h3>Requirements:</h3>
-        <ul>
-          <li>3+ years of experience with React</li>
-          <li>Strong knowledge of TypeScript</li>
-          <li>Experience with CSS frameworks like Tailwind</li>
-          <li>Understanding of responsive design principles</li>
-        </ul>`,
-      },
-      excerpt: {
-        rendered: "We are looking for a skilled Frontend Developer to join our team.",
-      },
-      categories: [1],
-      categories_data: [{ id: 1, name: "Technology", slug: "technology", count: 3 }],
-      meta: {
-        company: "Tech Solutions Inc.",
-        location: "Remote",
-        job_type: "Full-time",
-        salary: "$80,000 - $120,000",
-      },
-    },
-    {
-      id: 1002,
-      date: currentDate,
-      slug: "ux-designer",
-      title: {
-        rendered: "UX Designer",
-      },
-      content: {
-        rendered: `<p>Join our creative team as a UX Designer to create beautiful and functional user experiences for our products.</p>
-        <h3>Requirements:</h3>
-        <ul>
-          <li>Portfolio demonstrating UX design skills</li>
-          <li>Experience with Figma or similar design tools</li>
-          <li>Understanding of user research and testing</li>
-          <li>Ability to collaborate with developers</li>
-        </ul>`,
-      },
-      excerpt: {
-        rendered: "Join our creative team as a UX Designer to create beautiful and functional user experiences.",
-      },
-      categories: [3],
-      categories_data: [{ id: 3, name: "Design", slug: "design", count: 2 }],
-      meta: {
-        company: "Creative Agency",
-        location: "San Francisco, CA",
-        job_type: "Full-time",
-        salary: "$90,000 - $110,000",
-      },
-    },
-    {
-      id: 1003,
-      date: currentDate,
-      slug: "marketing-manager",
-      title: {
-        rendered: "Marketing Manager",
-      },
-      content: {
-        rendered: `<p>We're seeking an experienced Marketing Manager to lead our marketing efforts and drive growth.</p>
-        <h3>Requirements:</h3>
-        <ul>
-          <li>5+ years of marketing experience</li>
-          <li>Experience with digital marketing channels</li>
-          <li>Strong analytical skills</li>
-          <li>Excellent communication abilities</li>
-        </ul>`,
-      },
-      excerpt: {
-        rendered: "We're seeking an experienced Marketing Manager to lead our marketing efforts and drive growth.",
-      },
-      categories: [2],
-      categories_data: [{ id: 2, name: "Marketing", slug: "marketing", count: 1 }],
-      meta: {
-        company: "Growth Co",
-        location: "New York, NY",
-        job_type: "Full-time",
-        salary: "$85,000 - $115,000",
-      },
-    },
-  ]
-}
-
-// Update the getJob function to handle 404 errors and provide fallback data
+// Replace the getJob function with this improved version
 export async function getJob(slug: string): Promise<Job | null> {
   try {
-    const url = new URL(`${WP_API_URL}/jobs`)
-    url.searchParams.append("slug", slug)
-    url.searchParams.append("_embed", "true")
+    // Read jobs from the JSON file
+    const jobs = readJsonFile<any[]>("data/job_details.json")
 
-    const response = await fetch(url.toString(), {
-      next: { revalidate: 60 }, // Revalidate every minute
-    }).catch(() => {
-      return new Response(null, { status: 404 })
-    })
+    // Find the job with the matching slug
+    const job = jobs.find((j) => j.slug === slug)
 
-    if (!response.ok) {
-      console.error(`Failed to fetch job: ${response.status}`)
-
-      // For specific job slugs, return fallback data
-      const fallbackJobs = getFallbackJobs()
-      const fallbackJob = fallbackJobs.find((job) => job.slug === slug)
-      return fallbackJob || null
+    if (!job) {
+      return null
     }
 
-    const jobs = await response.json()
+    // Format the job
+    const formattedJob = formatJobData(job)
 
-    if (!jobs || !Array.isArray(jobs) || jobs.length === 0) {
-      // Check fallback data for this slug
-      const fallbackJobs = getFallbackJobs()
-      const fallbackJob = fallbackJobs.find((job) => job.slug === slug)
-      return fallbackJob || null
+    // Read categories from the JSON file
+    const categories = readJsonFile<Category[]>("data/categories.json")
+
+    // Add category data to the job
+    if (job.categories && Array.isArray(job.categories)) {
+      formattedJob.categories_data = categories.filter((cat) => job.categories.includes(cat.id))
     }
 
-    const job = jobs[0]
-
-    // Fetch categories
-    if (job.categories && Array.isArray(job.categories) && job.categories.length > 0) {
-      try {
-        const categoriesUrl = new URL(`${WP_API_URL}/categories`)
-        categoriesUrl.searchParams.append("include", job.categories.join(","))
-
-        const categoriesResponse = await fetch(categoriesUrl.toString())
-
-        if (categoriesResponse.ok) {
-          const categories = await categoriesResponse.json()
-          if (Array.isArray(categories)) {
-            job.categories_data = categories
-          }
-        }
-      } catch (categoryError) {
-        console.error("Error fetching categories:", categoryError)
-        // Continue without categories
-      }
-    }
-
-    return job
+    return formattedJob
   } catch (error) {
     console.error("Error fetching job:", error)
-
-    // Check fallback data for this slug
-    const fallbackJobs = getFallbackJobs()
-    const fallbackJob = fallbackJobs.find((job) => job.slug === slug)
-    return fallbackJob || null
+    return null
   }
 }
 
-// Replace the getAllClients function with this improved version
+// Create a sample clients JSON file
+const sampleClients = [
+  {
+    id: 1,
+    date: new Date().toISOString(),
+    slug: "google",
+    title: "Google",
+    content: "Google is a multinational technology company specializing in Internet-related services and products.",
+    excerpt: "Google is a multinational technology company...",
+    categories: [1, 2],
+    meta: {
+      address: "Mountain View, CA",
+      website: "https://google.com",
+      industry: "Technology",
+      stock_symbol: "GOOGL",
+      logo_url: "https://logo.clearbit.com/google.com",
+    },
+  },
+  {
+    id: 2,
+    date: new Date().toISOString(),
+    slug: "microsoft",
+    title: "Microsoft",
+    content: "Microsoft Corporation is an American multinational technology corporation.",
+    excerpt: "Microsoft Corporation is an American multinational...",
+    categories: [1, 3],
+    meta: {
+      address: "Redmond, WA",
+      website: "https://microsoft.com",
+      industry: "Technology",
+      stock_symbol: "MSFT",
+      logo_url: "https://logo.clearbit.com/microsoft.com",
+    },
+  },
+]
+
+// Replace the getAllClients function with this version
 export async function getAllClients(): Promise<Client[]> {
   try {
-    // Check if the clients endpoint exists first
-    const checkResponse = await fetch(`${WP_API_URL}`, {
-      method: "HEAD",
-      next: { revalidate: 60 },
-    })
-
-    if (!checkResponse.ok) {
-      console.warn("WordPress API may not be accessible")
-      return []
-    }
-
-    // Use a more robust URL construction
-    const url = new URL(`${WP_API_URL}/clients`)
-    url.searchParams.append("_embed", "true")
-    url.searchParams.append("per_page", "100")
-
-    // Fetch clients with better error handling
-    const clientsResponse = await fetch(url.toString(), {
-      next: { revalidate: 60 },
-    }).catch((error) => {
-      console.log("Clients endpoint may not exist yet:", error)
-      return new Response(JSON.stringify([]), { status: 200 })
-    })
-
-    // If endpoint doesn't exist yet, return empty array
-    if (!clientsResponse.ok) {
-      console.log("Clients endpoint returned error, may not be set up yet")
-      return []
-    }
-
-    let clients: Client[] = []
-    try {
-      const data = await clientsResponse.json()
-      if (Array.isArray(data)) {
-        clients = data
-      }
-    } catch (parseError) {
-      console.error("Error parsing clients response:", parseError)
-      return []
-    }
-
-    // Rest of the function remains similar but with better error handling
-    const categoryIds = new Set<number>()
-    clients.forEach((client) => {
-      if (client.categories && Array.isArray(client.categories)) {
-        client.categories.forEach((id) => categoryIds.add(id))
-      }
-    })
-
-    let categories: Category[] = []
-    if (categoryIds.size > 0) {
-      try {
-        const categoriesUrl = new URL(`${WP_API_URL}/categories`)
-        categoriesUrl.searchParams.append("include", Array.from(categoryIds).join(","))
-
-        const categoriesResponse = await fetch(categoriesUrl.toString())
-
-        if (categoriesResponse.ok) {
-          const categoriesData = await categoriesResponse.json()
-          if (Array.isArray(categoriesData)) {
-            categories = categoriesData
-          }
-        }
-      } catch (categoryError) {
-        console.error("Error fetching categories:", categoryError)
-      }
-    }
-
-    return clients.map((client) => ({
-      ...client,
-      categories_data: categories.filter(
-        (cat) => client.categories && Array.isArray(client.categories) && client.categories.includes(cat.id),
-      ),
+    // For now, return sample clients
+    // In a real implementation, you would read from a clients.json file
+    return sampleClients.map((client) => ({
+      id: client.id,
+      date: client.date,
+      slug: client.slug,
+      title: {
+        rendered: client.title,
+      },
+      content: {
+        rendered: `<p>${client.content}</p>`,
+      },
+      excerpt: {
+        rendered: client.excerpt,
+      },
+      categories: client.categories,
+      meta: client.meta,
     }))
   } catch (error) {
     console.error("Error fetching clients:", error)
@@ -321,59 +165,32 @@ export async function getAllClients(): Promise<Client[]> {
   }
 }
 
-// Replace the getClient function with this improved version
+// Replace the getClient function with this version
 export async function getClient(slug: string): Promise<Client | null> {
   try {
-    const url = new URL(`${WP_API_URL}/clients`)
-    url.searchParams.append("slug", slug)
-    url.searchParams.append("_embed", "true")
+    // Find the client with the matching slug
+    const client = sampleClients.find((c) => c.slug === slug)
 
-    const response = await fetch(url.toString(), {
-      next: { revalidate: 60 },
-    }).catch(() => {
-      console.log("Clients endpoint may not exist yet")
-      return new Response(JSON.stringify([]), { status: 200 })
-    })
-
-    if (!response.ok) {
-      console.log("Client endpoint returned error, may not be set up yet")
+    if (!client) {
       return null
     }
 
-    let clients
-    try {
-      clients = await response.json()
-    } catch (parseError) {
-      console.error("Error parsing client response:", parseError)
-      return null
+    return {
+      id: client.id,
+      date: client.date,
+      slug: client.slug,
+      title: {
+        rendered: client.title,
+      },
+      content: {
+        rendered: `<p>${client.content}</p>`,
+      },
+      excerpt: {
+        rendered: client.excerpt,
+      },
+      categories: client.categories,
+      meta: client.meta,
     }
-
-    if (!clients || !Array.isArray(clients) || clients.length === 0) {
-      return null
-    }
-
-    const client = clients[0]
-
-    // Fetch categories with better error handling
-    if (client.categories && Array.isArray(client.categories) && client.categories.length > 0) {
-      try {
-        const categoriesUrl = new URL(`${WP_API_URL}/categories`)
-        categoriesUrl.searchParams.append("include", client.categories.join(","))
-
-        const categoriesResponse = await fetch(categoriesUrl.toString())
-
-        if (categoriesResponse.ok) {
-          const categories = await categoriesResponse.json()
-          if (Array.isArray(categories)) {
-            client.categories_data = categories
-          }
-        }
-      } catch (categoryError) {
-        console.error("Error fetching categories:", categoryError)
-      }
-    }
-
-    return client
   } catch (error) {
     console.error("Error fetching client:", error)
     return null
